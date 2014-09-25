@@ -1,0 +1,14 @@
+{ "categories": [
+ { "Name":"Bang", "cards": [
+	{ "Name":"Bang", "SpriteName":"angstigheidCards" }
+] },
+ { "Name":"Bedroefd", "cards": [
+	{ "Name":"Bedroefd", "SpriteName":"verdrietigheidCards" }
+ ] },
+ { "Name":"Blij", "cards": [
+	{ "Name":"Blij", "SpriteName":"vrolijkheidCards" }
+ ] },
+ { "Name":"Boos", "cards": [
+	{ "Name":"Boos", "SpriteName":"boosheidCards" }
+ ] }
+] }
