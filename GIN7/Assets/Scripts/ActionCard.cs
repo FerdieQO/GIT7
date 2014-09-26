@@ -20,10 +20,22 @@ public class ActionCard : CardController
     protected override void NotifyDropped()
     {
         base.NotifyDropped();
+        GameObject grid = GameObject.FindGameObjectWithTag("Grid");
+        _spriteRenderer.enabled = false;
+        transform.SetParent(grid.transform);
+
+        // If first
+        //transform.SetAsFirstSibling();
+        // If last
+        transform.SetAsLastSibling();
+        // Otherwise
+        //int index = 1;
+        //grid.transform.SetSiblingIndex(index);
+        _canDrag = false;
     }
 
-    public void SetCard(Sprite action)
+    public override CardType GetCardType()
     {
-        base.SetCard(action, CardType.Action);
+        return CardType.Action;
     }
 }

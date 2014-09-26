@@ -31,7 +31,8 @@ public class GameController : MonoBehaviour
         {
             _loaded = true;
         }
-        SpawnButtonCards();
+        //SpawnEmotionButtons();
+        SpawnActionButtons();
     }
 
     // Use this for initialization
@@ -46,7 +47,7 @@ public class GameController : MonoBehaviour
 
     }
 
-    private void SpawnButtonCards()
+    private void SpawnEmotionButtons()
     {
         float points = _categories.Count;
         float dX = Screen.width / points;
@@ -63,8 +64,38 @@ public class GameController : MonoBehaviour
             {
                 newCard.name = "ButtonCard";
                 newCard.layer = LayerMask.NameToLayer("UI");
-                var cardCont = newCard.GetComponent<CardController>();
-                cardCont.SetCard(emotion, CardType.Emotion);
+                var cardCont = newCard.AddComponent<EmotionCard>();
+
+                cardCont.SetCard(emotion);
+                cardCont.SetMenuItem(true);
+                i++;
+            }
+            else
+            {
+                print("Couldn't instantiate prefab.");
+            }
+        }
+    }
+
+    private void SpawnActionButtons()
+    {
+        float points = _actions.Length;
+        float dX = Screen.width / points;
+        float y = (Screen.height / 100 * 20);
+        int i = 0;
+        foreach (Sprite action in _actions)
+        {
+            Vector3 targetPos = Camera.main.ScreenToWorldPoint(new Vector3(i * dX + (dX / 2), y, 0));
+            targetPos.z = 0;
+            var newCard = Instantiate(cardPrefab, targetPos, Quaternion.identity) as GameObject;
+            if (newCard != null)
+            {
+                newCard.name = "ButtonCard";
+                newCard.layer = LayerMask.NameToLayer("UI");
+                var cardCont = newCard.AddComponent<ActionCard>();
+
+                cardCont.SetCard(action);
+                cardCont.SetMenuItem(true);
                 i++;
             }
             else
@@ -125,7 +156,9 @@ public class GameController : MonoBehaviour
         {
             return false;
         }
-        newCard.name = "ButtonCard";
+        newCard.name = card.gameObject.name;
+        newCard.GetComponent<CardController>().SetMenuItem(true);
+        card.SetMenuItem(false);
         card.gameObject.layer = LayerMask.NameToLayer("Default");
         card.gameObject.name = "DragCard";
         return true;

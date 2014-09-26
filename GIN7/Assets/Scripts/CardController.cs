@@ -1,5 +1,6 @@
 ﻿using System;
 using UnityEngine;
+using UnityEngine.UI;
 
 public enum CardType
 {
@@ -10,23 +11,27 @@ public enum CardType
 
 public class CardController : MonoBehaviour
 {
-
-    private SpriteRenderer _spriteRenderer;
+    private Image _image;
+    protected SpriteRenderer _spriteRenderer;
 
     private Sprite _sprite;
-    private CardType _cardType;
 
     private bool isMoving = false;
     private Vector3 target;
     private Vector3 cardVelocity = Vector3.zero;
 
-    private bool _canDrag = true;
+    protected bool _canDrag = true;
     private bool _isDragging = false;
     private const float _maxSpeed = .5f;
+    protected const float _timeToHold = 2f;
+    protected float _currHoldTime = 0f;
+
+    private bool _menuItem;
 
     void Awake()
     {
         SpriteRenderer[] renderers = gameObject.GetComponentsInChildren<SpriteRenderer>(true);
+        _image = gameObject.GetComponent<Image>();
         foreach (var rend in renderers)
         {
             if (rend.gameObject.name.Equals("Front"))
@@ -66,13 +71,29 @@ public class CardController : MonoBehaviour
         {
             return;
         }
-        if (gameObject.layer != LayerMask.NameToLayer("UI"))
+        if (!_menuItem)
         {
             StartDrag();
         }
         else if (GameController.GetGameController().ChangeButtonCard(this))
         {
             StartDrag();
+        }
+    }
+
+    private void OnMouseDrag()
+    {
+        if (!_canDrag)
+        {
+            if (_currHoldTime + Time.deltaTime >= _timeToHold)
+            {
+                _canDrag = true;
+                print("Draggable");
+            }
+            else
+            {
+                _currHoldTime += Time.deltaTime;
+            }
         }
     }
 
@@ -89,6 +110,11 @@ public class CardController : MonoBehaviour
     {
         if (!_isDragging)
         {
+            if (transform.IsChildOf(GameObject.FindGameObjectWithTag("Grid").transform))
+            {
+                transform.parent = null;
+            }
+
             _dragZ = transform.position.z;
             Vector3 pos = transform.position;
             pos.z = -1;
@@ -104,14 +130,14 @@ public class CardController : MonoBehaviour
             _isDragging = false;
             Vector3 pos = transform.position;
             pos.z = _dragZ;
-            transform.position = pos;
             NotifyDropped();
+            transform.position = pos;
         }
     }
 
     protected virtual void NotifyDropped()
     {
-        
+
     }
 
     void Drag(float deltaTime)
@@ -146,10 +172,20 @@ public class CardController : MonoBehaviour
         isMoving = true;
     }
 
-    public virtual void SetCard(Sprite front, CardType type)
+    public void SetMenuItem(bool isMenuItem)
     {
-        _cardType = type;
-        _spriteRenderer.sprite = _sprite = front;
+        _menuItem = isMenuItem;
+    }
+
+    public bool IsMenuItem()
+    {
+        return _menuItem;
+    }
+
+    public virtual void SetCard(Sprite front)
+    {
+         
+        _spriteRenderer.sprite = _image.sprite = _sprite = front;
     }
 
     public Sprite GetCard()
@@ -157,8 +193,8 @@ public class CardController : MonoBehaviour
         return _sprite;
     }
 
-    public CardType GetCardType()
+    public virtual CardType GetCardType()
     {
-        return _cardType;
+        return CardType.None;
     }
 }
