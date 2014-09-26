@@ -13,7 +13,7 @@ public class TimelineController : MonoBehaviour
     {
         _cards = new List<GameObject>();
         _position = this.transform.position;
-        FindCards();
+
         //PlaceCards();
     }
 
@@ -22,6 +22,7 @@ public class TimelineController : MonoBehaviour
     {
         if (Input.GetKeyUp("space"))
         {
+            FindCards();
             PlaceCards();
         }
     }
@@ -31,7 +32,7 @@ public class TimelineController : MonoBehaviour
     {
         _cards.Clear();
 
-        foreach (GameObject card in GameObject.FindGameObjectsWithTag("Card"))
+        foreach (GameObject card in GameObject.FindGameObjectsWithTag("ToBeSorted"))
         {
             _cards.Add(card);
         }
@@ -47,7 +48,8 @@ public class TimelineController : MonoBehaviour
             //card.transform.position = Vector3.MoveTowards(card.transform.position,
             //    new Vector3(_transform.position.x + offset, 0, 0), Time.deltaTime*CARD_MOVEMENT_SPEED);
             var target = new Vector3(_position.x + offset, _position.y, _position.z);
-            card.GetComponent<CardController>().SetMovement(target);
+            CardController cc = card.GetComponent<CardController>();
+            cc.SetMovement(target);
             card.transform.parent = this.gameObject.transform;
             offset += OFFSET_INCREMENT;
         }

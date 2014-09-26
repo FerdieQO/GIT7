@@ -9,6 +9,8 @@ public class GameController : MonoBehaviour
     private Sprite[] _actions;
     private Dictionary<String, Category> _categories;
 
+    public GameObject cardPrefab;
+
     public GUISkin guiSkin;
     public System.Random randomizer;
 
@@ -17,7 +19,19 @@ public class GameController : MonoBehaviour
     void Awake()
     {
         CardLoader.Load(out _actions, out _categories);
-        _loaded = true;
+        if (GameObject.FindGameObjectsWithTag("GameController").Length != 1)
+        {
+            print("Multiple GameObjects with tag GameController.");
+        }
+        else if (cardPrefab == null)
+        {
+            print("CardPrefab is not assigned.");
+        }
+        else
+        {
+            _loaded = true;
+        }
+        SpawnButtonCards();
     }
 
     // Use this for initialization
@@ -30,6 +44,34 @@ public class GameController : MonoBehaviour
     void Update()
     {
 
+    }
+
+    private void SpawnButtonCards()
+    {
+        float points = _categories.Count;
+        float dX = Screen.width / points;
+        float y = (Screen.height / 100 * 20);
+        int i = 0;
+        foreach (Category cat in _categories.Values)
+        {
+            Vector3 targetPos = Camera.main.ScreenToWorldPoint(new Vector3(i * dX + (dX / 2), y, 0));
+            targetPos.z = 0;
+            Sprite emotion = cat.GetMainEmotion();
+
+            var newCard = Instantiate(cardPrefab, targetPos, Quaternion.identity) as GameObject;
+            if (newCard != null)
+            {
+                newCard.name = "ButtonCard";
+                newCard.layer = LayerMask.NameToLayer("UI");
+                var cardCont = newCard.GetComponent<CardController>();
+                cardCont.SetCard(emotion, CardType.Emotion);
+                i++;
+            }
+            else
+            {
+                print("Couldn't instantiate prefab.");
+            }
+        }
     }
 
     void OnGUI()
@@ -54,15 +96,39 @@ public class GameController : MonoBehaviour
         foreach (Category cat in _categories.Values)
         {
             GUILayout.BeginVertical();
-            Texture2D tx = cat.GetMainEmotion().texture;
-            GUILayout.Box(tx, style, GUILayout.Width(width));
+            Sprite emotion = cat.GetMainEmotion();
+            Texture2D tx = emotion.texture;
+            if (GUILayout.Button(tx, style, GUILayout.Width(width)))
+            {
+                DragCard(emotion, CardType.Emotion);
+            }
             GUILayout.EndVertical();
             GUILayout.FlexibleSpace();
         }
         GUILayout.EndHorizontal();
         GUILayout.FlexibleSpace();
         GUILayout.EndArea();
-         */
+        */
+
+
+    }
+
+    public static GameController GetGameController()
+    {
+        return GameObject.FindGameObjectWithTag("GameController").GetComponent<GameController>();
+    }
+
+    public bool ChangeButtonCard(CardController card)
+    {
+        var newCard = Instantiate(card.gameObject, card.transform.position, Quaternion.identity) as GameObject;
+        if (newCard == null)
+        {
+            return false;
+        }
+        newCard.name = "ButtonCard";
+        card.gameObject.layer = LayerMask.NameToLayer("Default");
+        card.gameObject.name = "DragCard";
+        return true;
     }
 
     public Sprite[] GetActions()

@@ -23,6 +23,12 @@ public class Category
         }
     }
 
+    public Sprite GetEmotion(String name)
+    {
+        Sprite emotion;
+        return _emotions.TryGetValue(name, out emotion) ? emotion : null;
+    }
+
     public Dictionary<String, Sprite> GetEmotions()
     {
         return _emotions;

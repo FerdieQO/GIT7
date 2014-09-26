@@ -17,6 +17,13 @@ public class EmotionCard : CardController
 
     }
 
+    protected override void NotifyDropped()
+    {
+        // Link this emotion to an Action.
+        // Or destroy if not above an Action.
+        Destroy(gameObject);
+    }
+
     public void SetCard(Sprite emotion)
     {
         base.SetCard(emotion, CardType.Emotion);

@@ -17,6 +17,11 @@ public class ActionCard : CardController
 
     }
 
+    protected override void NotifyDropped()
+    {
+        base.NotifyDropped();
+    }
+
     public void SetCard(Sprite action)
     {
         base.SetCard(action, CardType.Action);
